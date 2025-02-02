@@ -503,6 +503,7 @@ jobs:
         export BUILD_USERNAME=${{ github.actor }} ; \
         export BUILD_HOSTNAME=kurisu ; \
         export ALLOW_MISSING_DEPENDENCIES=true ; \
+        export TEMPORARY_DISABLE_PATH_RESTRICTIONS=true ; \
         export SELINUX_IGNORE_NEVERALLOWS=true ; \
         rm -rf vendor/qcom/opensource/fwk-detect ; \
         sed -i 's/$(error SELINUX_IGNORE_NEVERALLOWS := true cannot be used in user builds)/$(warning SELINUX_IGNORE_NEVERALLOWS := true is not recommended for user builds)/' system/sepolicy/Android.mk ; \
