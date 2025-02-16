@@ -515,7 +515,7 @@ jobs:
         sed -i 's/$(error SELINUX_IGNORE_NEVERALLOWS := true cannot be used in user builds)/$(warning SELINUX_IGNORE_NEVERALLOWS := true is not recommended for user builds)/' system/sepolicy/Android.mk ; \
         rm -rf hardware/qcom-caf/sm* hardware/qcom-caf/sdm* hardware/qcom-caf/msm* ; \
         . device/motorola/targets/scripts/replace_camera_sepolicy.sh ; \
-        sed -i '117,118d' vendor/lineage/config/common.mk  ; \
+        sed -i '120,121d' vendor/lineage/config/common.mk  ; \
         source build/envsetup.sh && \
 
         echo "Repository: ${{ github.repository }}"; \
