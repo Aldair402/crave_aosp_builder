@@ -512,8 +512,6 @@ jobs:
         export ALLOW_MISSING_DEPENDENCIES=true ; \
         export SELINUX_IGNORE_NEVERALLOWS=true ; \
         rm -rf vendor/qcom/opensource/fwk-detect ; \
-        wget https://raw.githubusercontent.com/Aldair69/android_build_soong/2cbd0b0e58f1f40b1f7bb72398f0b585de48b8e8/ui/build/paths/config.go ; \
-        mv config.go build/soong/ui/build/paths/config.go ; \
         sed -i 's/$(error SELINUX_IGNORE_NEVERALLOWS := true cannot be used in user builds)/$(warning SELINUX_IGNORE_NEVERALLOWS := true is not recommended for user builds)/' system/sepolicy/Android.mk ; \
         rm -rf hardware/qcom-caf/sm* hardware/qcom-caf/sdm* hardware/qcom-caf/msm* ; \
         . device/motorola/targets/scripts/replace_camera_sepolicy.sh ; \
