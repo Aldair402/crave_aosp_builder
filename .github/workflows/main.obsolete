@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2024 Antonino Scordino
-# Copyright (C) 2024 Souhrud Reddy
+# Copyright (C) 2024-2025 Antonino Scordino
+# Copyright (C) 2024-2025 Souhrud Reddy
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
-name: TWRP Builder(Legacy)
+name: Crave Builder
 on:
   workflow_dispatch:
     # Various inputs to simplify usage of workflow.
@@ -13,10 +13,21 @@ on:
       BASE_PROJECT:
         description: 'Choose a base project:'
         required: true
-        default: 'TWRP 12.1'
+        default: 'LineageOS 21.0'
         type: choice
         options:
-          - 'TWRP 12.1'
+          - 'LineageOS 20.0'
+          - 'LineageOS 21.0'
+          - 'LineageOS 22.1'
+          - 'ArrowOS 13.1'
+          - 'DerpFest 14.0'
+          - 'CipherOS 14'
+          - 'PixelOS 15'
+          - 'RisingOS 15 Revived'
+          - 'LineageOS 18.1'
+          - 'LineageOS 16.0'
+          - 'CyanogenMOD 14.1'
+          - 'AOSP'
       BUILD_DIFFERENT_ROM:
         description: "Command to initialize a different 'repo' project:"
         required: false
@@ -27,11 +38,11 @@ on:
       LOCAL_MANIFEST:
         description: "Personal local manifest [repository or raw]:"
         required: true
-        default: 'https://github.com/sounddrill31/local_manifests'
+        default: 'https://github.com/sounddrill31/local_manifests_oxygen'
       LOCAL_MANIFEST_BRANCH:
         description: "Personal local manifest's branch:"
         required: false
-        default: 'twrp-oxygen-12.1'
+        default: 'lineage-21-qpr3'
       DEVICE_NAME:
         description: "Device's codename:"
         required: true
@@ -39,11 +50,11 @@ on:
       PRODUCT_NAME:
         description: "Product to build:"
         required: true
-        default: "twrp_oxygen"
+        default: "oxygen"
       BUILD_COMMAND:
         description: 'Command to be used for compiling:'
         required: true
-        default: 'make recoveryimage -j\$(nproc --all)'
+        default: 'mka bacon'
       BUILD_TYPE:
         description: 'Type of build:'
         required: true
@@ -78,30 +89,81 @@ jobs:
         fi
         bash scripts/env-checker.sh
 
-    - name: Display Run Parameters # Credit to azwhikaru for this part
-      run: |
-        echo "::group::User Environment Variables"
-        echo "Base Project: ${{ github.event.inputs.BASE_PROJECT }}"
-        echo "Extra Repo Init: ${{ github.event.inputs.BUILD_DIFFERENT_ROM }}"
-        echo "Removals: ${{ github.event.inputs.REMOVALS }}"
-        echo "Local Manifest: ${{ github.event.inputs.LOCAL_MANIFEST }}"
-        echo "Local Manifest Branch: ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }}"
-        echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
-        echo "Lunch Target: ${{ github.event.inputs.PRODUCT_NAME }} ${{ github.event.inputs.BUILD_TYPE }}"
-        echo "Build Command: ${{ github.event.inputs.BUILD_COMMAND }}"
-        echo "Clean Build: ${{ github.event.inputs.CLEAN_BUILD }}"
-        echo "::endgroup::"
-
     - name: Set Project variables
       id: proj-variables
       run: |
         case "${{ github.event.inputs.BASE_PROJECT }}" in
-        "TWRP 12.1")
-          export PROJECTFOLDER="/crave-devspaces/TWRP12"
-          export PROJECTID="78"
-          export REPO_INIT="repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1"
+        "ArrowOS 13.1")
+          export PROJECTFOLDER="/crave-devspaces/Arrow13"
+          export PROJECTID="73"
+          export REPO_INIT="repo init -u https://github.com/ArrowOS/android_manifest.git -b arrow-13.1 --depth=1"
+
+        ;;
+        "DerpFest 14.0")
+          export PROJECTFOLDER="/crave-devspaces/DerpFest14"
+          export PROJECTID="64"
+          export REPO_INIT="repo init -u https://github.com/DerpFest-AOSP/manifest.git -b 14 --depth=1"
+        ;;
+        "LineageOS 21.0")
+          export PROJECTFOLDER="/crave-devspaces/Lineage21"
+          export PROJECTID="72"
+          export REPO_INIT="repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs --depth=1"
+        ;;
+        "LineageOS 22.1")
+          export PROJECTFOLDER="/crave-devspaces/Lineage22"
+          export PROJECTID="93"
+          export REPO_INIT="repo init -u https://github.com/accupara/los22.git -b lineage-22.1 --git-lfs --depth=1"
+        ;;
+        "LineageOS 20.0")
+          export PROJECTFOLDER="/crave-devspaces/Lineage20"
+          export PROJECTID="36"
+          export REPO_INIT="repo init -u https://github.com/accupara/los20.git -b lineage-20.0 --git-lfs --depth=1"
+        ;;
+        "CipherOS 14")
+          export PROJECTFOLDER="/crave-devspaces/Cipher14"
+          export PROJECTID="79"
+          export REPO_INIT="repo init -u https://github.com/CipherOS/android_manifest.git -b fourteen --git-lfs --depth=1"
+        ;;
+        "PixelOS 15")
+          export PROJECTFOLDER="/crave-devspaces/Pixel15"
+          export PROJECTID="82"
+          export REPO_INIT="repo init -u https://github.com/PixelOS-AOSP/manifest.git -b fifteen --git-lfs --depth=1"
+        ;;
+        "RisingOS 15 Revived")
+          export PROJECTFOLDER="/crave-devspaces/Rising15"
+          export PROJECTID="86"
+          export REPO_INIT="repo init -u https://github.com/RisingOS-Revived/android.git -b fifteen --git-lfs --depth=1"
+        ;;
+        "LineageOS 18.1")
+          export PROJECTFOLDER="/crave-devspaces/Lineage18"
+          export PROJECTID="85"
+          export REPO_INIT="repo init -u https://github.com/accupara/los18.1.git -b lineage-18.1 --git-lfs --depth=1"
+        ;;
+        "LineageOS 16.0")
+          export PROJECTFOLDER="/crave-devspaces/Lineage16"
+          export PROJECTID="81"
+          export REPO_INIT="repo init -u https://github.com/accupara/los16.git -b lineage-16.0 --git-lfs --depth=1"
+        ;;
+        "CyanogenMOD 14.1")
+          export PROJECTFOLDER="/crave-devspaces/Cyanogen14"
+          export PROJECTID="83"
+          export REPO_INIT="repo init -u https://github.com/accupara/los-cm14.1.git -b cm-14.1 --git-lfs --depth=1"
+        ;;
+        "AOSP")
+          export PROJECTFOLDER="/crave-devspaces/AOSP"
+          export PROJECTID="35"
+          export REPO_INIT="repo init -u https://android.googlesource.com/platform/manifest.git -b master --git-lfs --depth=1"
         ;;
         esac
+
+        if [[ ${{ github.event.inputs.PRODUCT_NAME }} == *_* ]] && [[ ${{ github.event.inputs.PRODUCT_NAME }} != gsi_* ]] && [[ ${{ github.event.inputs.PRODUCT_NAME }} != sdk_* ]] && [[ ${{ github.event.inputs.PRODUCT_NAME }} != *_sprout ]] && [[ ${{ github.event.inputs.PRODUCT_NAME }} != Mi439_* ]] && [[ ${{ github.event.inputs.PRODUCT_NAME }} != Mi8937_* ]]; then
+          LUNCH="lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }}"
+        elif [[ "${{ github.event.inputs.BASE_PROJECT }}" == "RisingOS 15 Revived" ]] && [[ "${{ github.event.inputs.BUILD_DIFFERENT_ROM }}" == "echo 'Build Starting!'" ]]; then
+            LUNCH="riseup ${{ github.event.inputs.PRODUCT_NAME }} ${{ github.event.inputs.BUILD_TYPE }}"
+        else
+            LUNCH="breakfast ${{ github.event.inputs.PRODUCT_NAME }} ${{ github.event.inputs.BUILD_TYPE }}"
+        fi
+
 
           if [[ "${{ github.event.inputs.LOCAL_MANIFEST }}" =~ \.xml(/)?$ ]]; then
             local_manifest_url="${{ github.event.inputs.LOCAL_MANIFEST }}"
@@ -115,20 +177,37 @@ jobs:
         echo "PROJECTFOLDER=$PROJECTFOLDER" >> "$GITHUB_OUTPUT"
         echo "PROJECTID=$PROJECTID"  >> "$GITHUB_OUTPUT"
         echo "REPO_INIT=$REPO_INIT" >> "$GITHUB_OUTPUT"
+        echo "LUNCH=$LUNCH" >> "$GITHUB_ENV"
+        echo "LUNCH=$LUNCH" >> "$GITHUB_OUTPUT"
         echo "LOCAL_MANIFEST=$LOCAL_MANIFEST" >> "$GITHUB_ENV"
         echo "LOCAL_MANIFEST=$LOCAL_MANIFEST" >> "$GITHUB_OUTPUT"
 
+    - name: Display Run Parameters # Credit to azwhikaru for this part
+      run: |
+        echo "::group::User Environment Variables"
+        echo "Base Project: ${{ github.event.inputs.BASE_PROJECT }}"
+        echo "Extra Repo Init: ${{ github.event.inputs.BUILD_DIFFERENT_ROM }}"
+        echo "Removals: ${{ github.event.inputs.REMOVALS }}"
+        echo "Local Manifest: ${{ github.event.inputs.LOCAL_MANIFEST }}"
+        echo "Local Manifest Branch: ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }}"
+        echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
+        echo "Breakfast/Lunch Target: ${{ env.LUNCH }}"
+        echo "Build Command: ${{ github.event.inputs.BUILD_COMMAND }}"
+        echo "Clean Build: ${{ github.event.inputs.CLEAN_BUILD }}"
+        echo "::endgroup::"
+
         echo "Displaying Local Manifests"
-          if [[ -z "${{ secrets.DISPLAY_FALSE }}" ]]; then
-            bash -c "$LOCAL_MANIFEST"
-            cat .repo/local_manifests/*.xml
-          else
-            echo "Displaying is disabled through secrets."
-          fi
+        if [[ -z "${{ secrets.DISPLAY_FALSE }}" ]]; then
+          bash -c "$LOCAL_MANIFEST"
+          cat .repo/local_manifests/*.xml
+        else
+          echo "Displaying is disabled through secrets."
+        fi
     outputs:
       PROJECTFOLDER: ${{ steps.proj-variables.outputs.PROJECTFOLDER }}
       PROJECTID: ${{ steps.proj-variables.outputs.PROJECTID }}
       REPO_INIT: ${{ steps.proj-variables.outputs.REPO_INIT }}
+      LUNCH: ${{ steps.proj-variables.outputs.LUNCH }}
       LOCAL_MANIFEST: ${{ steps.proj-variables.outputs.LOCAL_MANIFEST }}
 
   test:
@@ -142,10 +221,13 @@ jobs:
         PROJECTFOLDER="${{ needs.prepare.outputs.PROJECTFOLDER }}"
         PROJECTID="${{ needs.prepare.outputs.PROJECTID }}"
         REPO_INIT="${{ needs.prepare.outputs.REPO_INIT }}"
+        LUNCH="${{ needs.prepare.outputs.LUNCH }}"
+        LOCAL_MANIFEST="${{ needs.prepare.outputs.LOCAL_MANIFEST }}"
 
         echo "PROJECTFOLDER=$PROJECTFOLDER" >> "$GITHUB_ENV"
         echo "PROJECTID=$PROJECTID"  >> "$GITHUB_ENV"
         echo "REPO_INIT=$REPO_INIT" >> "$GITHUB_ENV"
+        echo "LUNCH=$LUNCH" >> "$GITHUB_ENV"
         echo "LOCAL_MANIFEST=$LOCAL_MANIFEST" >> "$GITHUB_ENV"
 
       # Download and configure 'repo'.
@@ -189,7 +271,6 @@ jobs:
 
         bash -c "$LOCAL_MANIFEST"
 
-    
         timeout 1m repo sync --force-sync || { exit_code=$?; [ $exit_code -eq 124 ] || (echo "Error: Process failed with exit code $exit_code"; exit $exit_code); }
         du -csh . # Output Size when done
         rm -rf .repo
@@ -198,7 +279,9 @@ jobs:
       PROJECTFOLDER: ${{ needs.prepare.outputs.PROJECTFOLDER }}
       PROJECTID: ${{ needs.prepare.outputs.PROJECTID }}
       REPO_INIT: ${{ needs.prepare.outputs.REPO_INIT }}
+      LUNCH: ${{ needs.prepare.outputs.LUNCH }}
       LOCAL_MANIFEST: "${{ needs.prepare.outputs.LOCAL_MANIFEST }}"
+
 
   build:
     name: Build using foss.crave.io
@@ -206,7 +289,7 @@ jobs:
       # Change this to self-hosted after setting up devspace as github actions runner
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.actor }}-small
+      group: ${{ github.repository_owner }}
     steps:
       # Accept Project Variables
     - name: Set Repo Project
@@ -214,20 +297,21 @@ jobs:
         PROJECTFOLDER="${{ needs.test.outputs.PROJECTFOLDER }}"
         PROJECTID="${{ needs.test.outputs.PROJECTID }}"
         REPO_INIT="${{ needs.test.outputs.REPO_INIT }}"
+        LUNCH="${{ needs.test.outputs.LUNCH }}"
         LOCAL_MANIFEST="${{ needs.test.outputs.LOCAL_MANIFEST }}"
 
         echo "PROJECTFOLDER=$PROJECTFOLDER" >> "$GITHUB_ENV"
         echo "PROJECTID=$PROJECTID"  >> "$GITHUB_ENV"
         echo "REPO_INIT=$REPO_INIT" >> "$GITHUB_ENV"
+        echo "LUNCH=$LUNCH" >> "$GITHUB_ENV"
         echo "LOCAL_MANIFEST=$LOCAL_MANIFEST" >> "$GITHUB_ENV"
 
       # Create a project folder
     - name: Create Project Folders
       run: |
-
         echo "DCDEVSPACE status: ${DCDEVSPACE}"
-        if [[ "${DCDEVSPACE}" != "1" ]]; then
-
+        if [[ $DCDEVSPACE != *1* ]]; then
+          
           curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s -- 
 
           mkdir -p ${HOME}/bin/
@@ -248,7 +332,7 @@ jobs:
         echo "Skipping removal"
         fi
 
-        if [[ "${DCDEVSPACE}" == "1" ]]; then
+        if [[ $DCDEVSPACE == *1* ]]; then
           crave clone create --projectID $PROJECTID $PROJECTFOLDER || echo "Crave clone create failed!"
         else
           mkdir $PROJECTFOLDER
@@ -316,7 +400,7 @@ jobs:
       run: |
         echo "DCDEVSPACE status: ${DCDEVSPACE}"
         mkdir -p $PROJECTFOLDER/.repo/manifests
-        if [[ "${DCDEVSPACE}" == "1" ]]; then
+        if [[ $DCDEVSPACE == *1* ]]; then
           echo 'No need to set up crave, we are already running in devspace!'
         else
           curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
@@ -327,7 +411,7 @@ jobs:
           cp crave.conf $PROJECTFOLDER
         fi
         if [[ -z "${{ secrets.CUSTOM_YAML }}" ]]; then
-          cp configs/crave/crave.yaml.twrp.legacy $PROJECTFOLDER/.repo/manifests/crave.yaml
+          cp configs/crave/crave.yaml.aosp $PROJECTFOLDER/.repo/manifests/crave.yaml
           echo "No Custom Configuration Found, Using Template!"
         else
           touch $PROJECTFOLDER/.repo/manifests/crave.yaml || true
@@ -353,6 +437,7 @@ jobs:
           echo "Building $BUILD_DIFFERENT_ROM"
         fi
         echo "BUILD_DIFFERENT_ROM=$BUILD_DIFFERENT_ROM" >> "$GITHUB_ENV"
+        echo "We will be building with $LUNCH"
 
       # Create a 'crave' job for building.
     - name: Start compilation through 'crave'
@@ -395,7 +480,7 @@ jobs:
         echo "Run ID: ${{ github.run_id }}"; \
 
         # Build the ROM
-        lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
+        $LUNCH && \
         make installclean && \
         ${{ github.event.inputs.BUILD_COMMAND }}"
 
@@ -461,7 +546,7 @@ jobs:
         cd $PROJECTFOLDER
         echo "${{ secrets.GITHUB_TOKEN }}" > token.txt
         crave push token.txt -d $(crave ssh -- pwd | grep -v Select | sed -s 's/\r//g')/
-        crave ssh -- "bash /opt/crave/github-actions/upload.sh '${{ github.run_id }}' '${{ github.event.inputs.DEVICE_NAME }}'  '${{ github.repository }}' '${{ github.event.inputs.PRODUCT_NAME }}-${{ github.run_id }}' '${{ secrets.EXTRA_FILES }}'"
+        crave ssh -- "export GH_UPLOAD_LIMIT="${{ secrets.GH_UPLOAD_LIMIT }}"; bash /opt/crave/github-actions/upload.sh '${{ github.run_id }}' '${{ github.event.inputs.DEVICE_NAME }}'  '${{ github.repository }}' '${{ github.event.inputs.PRODUCT_NAME }}-${{ github.run_id }}' '${{ secrets.EXTRA_FILES }}'"
 
       # Pull Errors and Display them
     - name: Display error.log
